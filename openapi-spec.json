@@ -1,0 +1,787 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Team3Green API for interacting with the Education & E-learning Project",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "localhost/api"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "User registration",
+        "description": "Register a new user",
+        "responses": {}
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "User login",
+        "description": "Authenticate a new user and retrieve token",
+        "responses": {}
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "User logout",
+        "description": "Invalidate user's auth token",
+        "responses": {}
+      }
+    },
+    "/courses": {
+      "post": {
+        "tags": ["Courses"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Create a course (admin only)",
+        "description": "Creates a new course",
+        "responses": {}
+      },
+      "get": {
+        "tags": ["Courses"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Fetch all courses (admin & student)",
+        "description": "Retrieve a list of all courses (only published courses will be available to students)",
+        "responses": {}
+      }
+    },
+    "/courses/{course}": {
+      "get": {
+        "tags": ["Courses"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          }
+        ],
+        "summary": "Fetch a course (admin & student)",
+        "description": "Retrieve a specific course (only published courses will be available to students)",
+        "responses": {}
+      },
+      "put": {
+        "tags": ["Courses"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          }
+        ],
+        "summary": "Update a course (admin only)",
+        "description": "Updates a specific course",
+        "responses": {}
+      },
+      "delete": {
+        "tags": ["Courses"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          }
+        ],
+        "summary": "Delete a course (admin only)",
+        "description": "Deletes a specific course",
+        "responses": {}
+      }
+    },
+    "/courses/{course}/publish": {
+      "post": {
+        "tags": ["Courses"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          }
+        ],
+        "summary": "Publish a course (admin only)",
+        "description": "Publish a course and make it available to the public",
+        "responses": {}
+      }
+    },
+    "/courses/{course}/unpublish": {
+      "post": {
+        "tags": ["Courses"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          }
+        ],
+        "summary": "Unpublish a course (admin only)",
+        "description": "Unpublish a course and make it unavailable to the public (visible to only admin)",
+        "responses": {}
+      }
+    },
+    "/courses/{course}/enroll": {
+      "post": {
+        "tags": ["Courses"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          }
+        ],
+        "summary": "Enroll in a course (student only)",
+        "description": "Enroll in a course (students can only enrol in published courses)",
+        "responses": {}
+      }
+    },
+    "/courses/{course}/unenroll": {
+      "post": {
+        "tags": ["Courses"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          }
+        ],
+        "summary": "Unenroll from a course (student only)",
+        "description": "Unenroll from a previously enrolled course",
+        "responses": {}
+      }
+    },
+    "/courses/{course}/lessons": {
+      "post": {
+        "tags": ["Lessons"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          }
+        ],
+        "summary": "Create a lesson (admin only)",
+        "description": "Create a lesson for a specific course",
+        "responses": {}
+      },
+      "get": {
+        "tags": ["Lessons"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          }
+        ],
+        "summary": "Fetch all lessons (admin & student)",
+        "description": "Retrieve all lessons in a specific course (only published lessons will be available for the students)",
+        "responses": {}
+      }
+    },
+    "/courses/{course}/lessons/{lesson}": {
+      "get": {
+        "tags": ["Lessons"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          },
+          {
+            "name": "lesson",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the lesson id"
+          }
+        ],
+        "summary": "Fetch all lesson (admin & student)",
+        "description": "Retrieve a specific lesson in a specific course (only published lessons will be available for students)",
+        "responses": {}
+      },
+      "put": {
+        "tags": ["Lessons"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          },
+          {
+            "name": "lesson",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the lesson id"
+          }
+        ],
+        "summary": "Update a lesson (admin only)",
+        "description": "Updates a specific lesson in a specific course",
+        "responses": {}
+      },
+      "delete": {
+        "tags": ["Lessons"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          },
+          {
+            "name": "lesson",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the lesson id"
+          }
+        ],
+        "summary": "Delete a lesson (admin only)",
+        "description": "Deletes a specific lesson in a specific course",
+        "responses": {}
+      }
+    },
+    "/courses/{course}/lessons/{lesson}/publish": {
+      "post": {
+        "tags": ["Lessons"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          },
+          {
+            "name": "lesson",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the lesson id"
+          }
+        ],
+        "summary": "Publish a lesson (admin only)",
+        "description": "Publish a lesson and make it available to the public",
+        "responses": {}
+      }
+    },
+    "/courses/{course}/lessons/{lesson}/unpublish": {
+      "post": {
+        "tags": ["Lessons"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          },
+          {
+            "name": "lesson",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the lesson id"
+          }
+        ],
+        "summary": "Unpublish a lesson (admin only)",
+        "description": "Unpublish a lesson and make it unavailable to the public (visible to only admin)",
+        "responses": {}
+      }
+    },
+    "/courses/{course}/lessons/{lesson}/complete": {
+      "post": {
+        "tags": ["Lessons"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          },
+          {
+            "name": "lesson",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the lesson id"
+          }
+        ],
+        "summary": "Mark a lesson as completed (student only)",
+        "description": "Set a specific lesson as completed for the enrolled student",
+        "responses": {}
+      }
+    },
+    "/courses/{course}/lessons/{lesson}/pending": {
+      "post": {
+        "tags": ["Lessons"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          },
+          {
+            "name": "lesson",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the lesson id"
+          }
+        ],
+        "summary": "Mark a lesson as completed (default) (student only)",
+        "description": "Set a specific lesson as incomplete/pending for the enrolled student",
+        "responses": {}
+      }
+    },
+    "/courses/{course}/lessons/{lesson}/quizzes": {
+      "post": {
+        "tags": ["Quizzes"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          },
+          {
+            "name": "lesson",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the lesson id"
+          }
+        ],
+        "summary": "Create a quiz (admin only)",
+        "description": "Create a quiz for a specific lesson",
+        "responses": {}
+      },
+      "get": {
+        "tags": ["Quizzes"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          },
+          {
+            "name": "lesson",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the lesson id"
+          }
+        ],
+        "summary": "Fetch all quizzes (admin & student)",
+        "description": "Retrieve all quizzes in a specific lesson (only published quizzes will be available to students)",
+        "responses": {}
+      }
+    },
+    "/courses/{course}/lessons/{lesson}/quizzes/{quiz}": {
+      "get": {
+        "tags": ["Quizzes"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          },
+          {
+            "name": "lesson",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the lesson id"
+          },
+          {
+            "name": "quiz",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the quiz id"
+          }
+        ],
+        "summary": "Fetch a quiz (admin & student)",
+        "description": "Retrieve a specific quiz in a specific lesson (only published quizzes will be available to students)",
+        "responses": {}
+      },
+      "put": {
+        "tags": ["Quizzes"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          },
+          {
+            "name": "lesson",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the lesson id"
+          },
+          {
+            "name": "quiz",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the quiz id"
+          }
+        ],
+        "summary": "Update a quiz (admin only)",
+        "description": "Update a specific quiz in a specific lesson",
+        "responses": {}
+      },
+      "delete": {
+        "tags": ["Quizzes"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          },
+          {
+            "name": "lesson",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the lesson id"
+          },
+          {
+            "name": "quiz",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the quiz id"
+          }
+        ],
+        "summary": "Delete a quiz (admin only)",
+        "description": "Delete a specific quiz from a specific lesson",
+        "responses": {}
+      }
+    },
+    "/courses/{course}/lessons/{lesson}/quizzes/{quiz}/results": {
+      "get": {
+        "tags": ["Quizzes"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          },
+          {
+            "name": "lesson",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the lesson id"
+          },
+          {
+            "name": "quiz",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the quiz id"
+          }
+        ],
+        "summary": "Fetch all results in a quiz (admin & student)",
+        "description": "Retrieve all the results from all quizzes in a specific lesson (students can only access their own results)",
+        "responses": {}
+      }
+    },
+    "/courses/{course}/lessons/{lesson}/quizzes/{quiz}/results/{result}": {
+      "get": {
+        "tags": ["Quizzes"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "course",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the course slug or id"
+          },
+          {
+            "name": "lesson",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the lesson id"
+          },
+          {
+            "name": "quiz",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the quiz id"
+          },
+          {
+            "name": "result",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "the result id"
+          }
+        ],
+        "summary": "Fetch a single result in a quiz (admin & student)",
+        "description": "Retrieve a specific result from a specific quiz in a specific lesson (students can only access their own results).",
+        "responses": {}
+      }
+    }
+  }
+}
