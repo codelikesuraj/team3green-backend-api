@@ -46,7 +46,7 @@ class AuthController extends BaseController
     public function login(Request $request)
     {
         $validation = Validator::make($request->input(), [
-            'email' => 'required|email|max:64|exists:users',
+            'email' => 'required|email|max:64',
             'password' => 'required|min:8|max:64',
         ]);
 
