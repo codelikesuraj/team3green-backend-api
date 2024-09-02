@@ -6,7 +6,8 @@
   },
   "servers": [
     {
-      "url": "localhost/api"
+      "description": "Test server",
+      "url": "https://team3green.fly.dev/api"
     }
   ],
   "components": {
