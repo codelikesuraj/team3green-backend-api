@@ -16,6 +16,162 @@
         "scheme": "bearer",
         "bearerFormat": "JWT"
       }
+    },
+    "responses": {
+      "UnauthorizedError": {
+        "description": "Unauthorised",
+        "content":{
+          "application/json":{
+            "schema":{
+              "$ref": "#/components/schemas/UnauthorizedError"
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "Validation error",
+        "content":{
+          "application/json":{
+            "schema":{
+              "$ref": "#/components/schemas/ValidationError"
+            }
+          }
+        }
+      },
+      "InvalidCredentials": {
+        "description": "Invalid credentials",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/InvalidCredentials"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "InvalidCredentials": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "invalid credentials"
+          },
+          "errors": {
+            "type": "array",
+            "minItems": 0,
+            "items":{
+              "type": "string",
+              "example": "any useful error message"
+            }
+          }
+        }
+      },
+      "SuccessMessage": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "success message"
+          }
+        }
+      },
+      "UnauthorizedError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "unauthorised"
+          },
+          "errors": {
+            "type": "array",
+            "minItems": 0,
+            "items":{
+              "type": "string",
+              "example": "unauthorised"
+            }
+          }
+        }
+      },
+      "ValidationError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "validation error"
+          },
+          "errors": {
+            "type": "array",
+            "minItems": 0,
+            "items":{
+              "type": "string",
+              "example": "error message for specific field"
+            }
+          }
+        }
+      },
+      "UserRegisterParam": {
+        "type": "object",
+        "required": ["name", "email", "password"],
+        "properties": {
+          "name":{
+            "type": "string",
+            "example": "john doe"
+          },
+          "email":{
+            "type": "string",
+            "example": "johndoe@example.com"
+          },
+          "password":{
+            "type": "string",
+            "example": "password"
+          }
+        }
+      },
+      "UserLoginParam": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email":{
+            "type": "string",
+            "example": "johndoe@example.com"
+          },
+          "password":{
+            "type": "string",
+            "example": "password"
+          }
+        }
+      },
+      "User":{
+        "type": "object",
+        "properties": {
+          "id":{
+            "description": "user's UUID",
+            "type": "string",
+            "example": "xxx-xxxxxxxx-xxxx-xxx"
+          },
+          "name":{
+            "type": "string",
+            "example": "john doe"
+          },
+          "email":{
+            "type": "string",
+            "example": "johndoe@example.com"
+          }
+        }
+      },
+      "UserWithToken": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          },
+          "user": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
+      }
     }
   },
   "paths": {
@@ -24,7 +180,43 @@
         "tags": ["Authentication"],
         "summary": "User registration",
         "description": "Register a new user",
-        "responses": {}
+        "requestBody":{
+          "required": true,
+          "content":{
+            "application/json":{
+              "schema":{
+                "$ref": "#/components/schemas/UserRegisterParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/UserWithToken"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "user registration successful"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidCredentials"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
       }
     },
     "/auth/login": {
@@ -32,15 +224,70 @@
         "tags": ["Authentication"],
         "summary": "User login",
         "description": "Authenticate a new user and retrieve token",
-        "responses": {}
+        "requestBody":{
+          "required": true,
+          "content":{
+            "application/json":{
+              "schema":{
+                "$ref": "#/components/schemas/UserLoginParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User login successfully",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/UserWithToken"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "user login successful"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/InvalidCredentials"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
       }
     },
     "/auth/logout": {
       "post": {
         "tags": ["Authentication"],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "summary": "User logout",
         "description": "Invalidate user's auth token",
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "User logout successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessage"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          }
+        }
       }
     },
     "/courses": {
