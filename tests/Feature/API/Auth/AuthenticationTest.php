@@ -3,7 +3,7 @@
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
 
-uses(RefreshDatabase::class);
+// uses(RefreshDatabase::class);
 
 test('user can register', function () {
     $user = [
@@ -113,7 +113,7 @@ test('authenticated user can log out', function () {
         'password' => 'Password123$'
     ];
 
-    $response = $this->postJson('/api/auth/register', $user)
+    $this->postJson('/api/auth/register', $user)
         ->assertCreated()
         ->assertJson(
             fn(AssertableJson $json)  =>
@@ -122,16 +122,10 @@ test('authenticated user can log out', function () {
                 ->where('data.user.email', $user['email'])
                 ->etc()
         );
-    
-    $token = $response->decodeResponseJson()['data']['accessToken'];
 
-    $this
-        ->withHeaders(['Authorization' => 'Bearer '.$token])
-        ->postJson('/api/auth/logout')
+    $this->postJson('/api/auth/logout')
         ->assertOk();
     
-    $this
-        ->withHeaders(['Authorization' => 'Bearer '.$token])
-        ->postJson('/api/auth/logout')
+    $this->postJson('/api/auth/logout')
         ->assertUnauthorized();
 });

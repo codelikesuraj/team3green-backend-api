@@ -2,26 +2,15 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Middleware\JWTMiddleware;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
 
-class AuthController implements HasMiddleware
+class AuthController
 {
-    public static function middleware()
-    {
-        return [
-            new Middleware('auth:api', only: ['logout']),
-            new Middleware(JWTMiddleware::class, only: ['logout']),
-        ];
-    }
-
     public function register(Request $request)
     {
         $validation = Validator::make($request->input(), [
