@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\CourseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,4 +14,8 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('login', [AuthController::class, 'login']);
     Route::post('logout', [AuthController::class, 'logout'])
         ->middleware('auth:api');
+});
+
+Route::group(['prefix' => 'courses', 'middleware' => 'auth:api'], function () {
+    Route::post('/', [CourseController::class, 'store']);
 });
