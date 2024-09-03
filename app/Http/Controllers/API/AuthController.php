@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Middleware\JWTMiddleware;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -10,14 +11,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
-use PHPOpenSourceSaver\JWTAuth\JWTAuth;
 
-class AuthController extends BaseController implements HasMiddleware
+class AuthController implements HasMiddleware
 {
     public static function middleware()
     {
         return [
-            new Middleware('auth:api', except: ['register', 'login'])
+            new Middleware('auth:api', only: ['logout']),
+            new Middleware(JWTMiddleware::class, only: ['logout']),
         ];
     }
 
@@ -35,20 +36,18 @@ class AuthController extends BaseController implements HasMiddleware
         ]);
 
         if ($validation->fails()) {
-            return $this->errorResponse('validation error', $this->extractErrors($validation->errors()->toArray()), 422);
+            return error_response('validation error', extract_errors($validation->errors()->toArray()), 422);
         }
 
-        $validated = $validation->validated();
-
         $user = User::create([
-            'name'=> $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password'])
+            'name'=> $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password)
         ]);
 
-        $token = Auth::guard('api')->login($user);
+        $token = Auth::guard('api')->attempt($request->only('email', 'password'));
 
-        return $this->successResponse('user created successfully', [
+        return success_response('user created successfully', [
             'accessToken' => $token,
             'user' => [
                 'id' => $user->id,
@@ -66,23 +65,22 @@ class AuthController extends BaseController implements HasMiddleware
         ]);
 
         if ($validation->fails()) {
-            return $this->errorResponse('validation error', $this->extractErrors($validation->errors()->toArray()), 422);
+            return error_response('validation error', extract_errors($validation->errors()->toArray()), 422);
         }
 
         $validated = $validation->validated();
 
         $user = User::where('email', $validated['email'])->first();
         if (!$user || !Hash::check($validated['password'], $user->password)) {
-            return $this->errorResponse('invalid credentials', [], 401);
+            return error_response('invalid credentials', [], 401);
         }
 
-        $token = Auth::guard('api')->login($user);
+        $token = Auth::guard('api')->attempt($request->only('email', 'password'));
         if (!$token) {
-            return $this->errorResponse('invalid credentials', [], 401);
+            return error_response('invalid credentials', [], 401);
         }
 
-
-        return $this->successResponse('user login successfully', [
+        return success_response('user login successfully', [
             'accessToken' => $token,
             'user' => [
                 'id' => $user->id,
@@ -92,11 +90,11 @@ class AuthController extends BaseController implements HasMiddleware
         ], 200);
     }
 
-    public function logout(Request $request)
+    public function logout()
     {
         Auth::guard('api')->logout();
 
-        return $this->successResponse('User logout successful');
+        return success_response('User logout successful');
     }
 
 

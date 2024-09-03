@@ -113,7 +113,7 @@ test('authenticated user can log out', function () {
         'password' => 'Password123$'
     ];
 
-    $this->postJson('/api/auth/register', $user)
+    $response = $this->postJson('/api/auth/register', $user)
         ->assertCreated()
         ->assertJson(
             fn(AssertableJson $json)  =>
@@ -123,11 +123,15 @@ test('authenticated user can log out', function () {
                 ->etc()
         );
     
+    $token = $response->decodeResponseJson()['data']['accessToken'];
+
     $this
+        ->withHeaders(['Authorization' => 'Bearer '.$token])
         ->postJson('/api/auth/logout')
         ->assertOk();
     
     $this
+        ->withHeaders(['Authorization' => 'Bearer '.$token])
         ->postJson('/api/auth/logout')
         ->assertUnauthorized();
 });
