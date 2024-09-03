@@ -4,13 +4,23 @@ namespace App\Http\Controllers\API;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Password;
+use PHPOpenSourceSaver\JWTAuth\JWTAuth;
 
-class AuthController extends BaseController
+class AuthController extends BaseController implements HasMiddleware
 {
+    public static function middleware()
+    {
+        return [
+            new Middleware('auth:api', except: ['register', 'login'])
+        ];
+    }
+
     public function register(Request $request)
     {
         $validation = Validator::make($request->input(), [
@@ -81,4 +91,13 @@ class AuthController extends BaseController
             ]
         ], 200);
     }
+
+    public function logout(Request $request)
+    {
+        Auth::guard('api')->logout();
+
+        return $this->successResponse('User logout successful');
+    }
+
+
 }

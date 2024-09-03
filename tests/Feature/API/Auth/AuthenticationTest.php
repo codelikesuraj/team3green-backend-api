@@ -100,7 +100,10 @@ test('unregistered user cannot login', function () {
     ];
 
     $this->postJson('/api/auth/login', $user)
-        ->assertUnauthorized();
+        ->assertUnauthorized()
+        ->assertJson([
+            'message' => 'invalid credentials'
+        ]);
 });
 
 test('authenticated user can log out', function () {
@@ -110,7 +113,7 @@ test('authenticated user can log out', function () {
         'password' => 'Password123$'
     ];
 
-    $response = $this->postJson('/api/auth/register', $user)
+    $this->postJson('/api/auth/register', $user)
         ->assertCreated()
         ->assertJson(
             fn(AssertableJson $json)  =>
@@ -119,8 +122,12 @@ test('authenticated user can log out', function () {
                 ->where('data.user.email', $user['email'])
                 ->etc()
         );
-
+    
     $this
         ->postJson('/api/auth/logout')
         ->assertOk();
+    
+    $this
+        ->postJson('/api/auth/logout')
+        ->assertUnauthorized();
 });
