@@ -19,8 +19,28 @@
       }
     },
     "responses": {
+      "CourseNotFoundError": {
+        "description": "course not found",
+        "content":{
+          "application/json":{
+            "schema":{
+              "$ref": "#/components/schemas/CourseNotFound"
+            }
+          }
+        }
+      },
+      "UnauthenticatedError": {
+        "description": "Unauthenticated",
+        "content":{
+          "application/json":{
+            "schema":{
+              "$ref": "#/components/schemas/UnauthenticatedError"
+            }
+          }
+        }
+      },
       "UnauthorizedError": {
-        "description": "Unauthorised",
+        "description": "Unauthorized",
         "content":{
           "application/json":{
             "schema":{
@@ -51,6 +71,48 @@
       }
     },
     "schemas": {
+      "CourseItem": {
+        "type": "object",
+        "properties": {
+          "id":{
+            "type": "string",
+            "example": "999"
+          },
+          "title":{
+            "type": "string",
+            "example": "course title"
+          },
+          "slug":{
+            "type": "string",
+            "example": "slug-based-on-course-title"
+          },
+          "summary":{
+            "type": "string",
+            "example": "a short description or summary of the course"
+          },
+          "description":{
+            "type": "string",
+            "example": "a long description of the course title which may span multiple lines and paragraphs"
+          }
+        }
+      },
+      "CourseNotFound": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "course not found"
+          },
+          "errors": {
+            "type": "array",
+            "minItems": 0,
+            "items":{
+              "type": "string",
+              "example": "any useful error message"
+            }
+          }
+        }
+      },
       "InvalidCredentials": {
         "type": "object",
         "properties": {
@@ -77,19 +139,36 @@
           }
         }
       },
-      "UnauthorizedError": {
+      "UnauthenticatedError": {
         "type": "object",
         "properties": {
           "message": {
             "type": "string",
-            "example": "unauthorised"
+            "example": "Unauthenticated"
           },
           "errors": {
             "type": "array",
             "minItems": 0,
             "items":{
               "type": "string",
-              "example": "unauthorised"
+              "example": "Unauthenticated"
+            }
+          }
+        }
+      },
+      "UnauthorizedError": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "unauthorized"
+          },
+          "errors": {
+            "type": "array",
+            "minItems": 0,
+            "items":{
+              "type": "string",
+              "example": "user does not have permission"
             }
           }
         }
@@ -286,7 +365,7 @@
             }
           },
           "401": {
-            "$ref": "#/components/responses/UnauthorizedError"
+            "$ref": "#/components/responses/UnauthenticatedError"
           }
         }
       }
@@ -301,7 +380,36 @@
         ],
         "summary": "Create a course (admin only)",
         "description": "Creates a new course",
-        "responses": {}
+        "responses": {
+          "201": {
+            "description": "Courses created successfully",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CourseItem"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "course created successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
       },
       "get": {
         "tags": ["Courses"],
@@ -312,7 +420,39 @@
         ],
         "summary": "Fetch all courses (admin & student)",
         "description": "Retrieve a list of all courses (only published courses will be available to students)",
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Course found",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "courses":{
+                          "type": "array",
+                          "minItems": 0,
+                          "items":{
+                            "$ref": "#/components/schemas/CourseItem"
+                          }
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "course found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          }
+        }
       }
     },
     "/courses/{course}": {
@@ -336,7 +476,33 @@
         ],
         "summary": "Fetch a course (admin & student)",
         "description": "Retrieve a specific course (only published courses will be available to students)",
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Course found",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/CourseItem"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "course found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/CourseNotFoundError"
+          }
+        }
       },
       "put": {
         "tags": ["Courses"],
