@@ -38,7 +38,7 @@ class CourseController extends Controller implements HasMiddleware
     }
 
     public function index(Request $request) {
-        return success_response('course created successfully', [
+        return success_response('courses fetched successfully', [
             'courses' => Course::when(is_student(auth()->user()), function ($query) {
                 $query->where('is_published', true);
             })->get()
