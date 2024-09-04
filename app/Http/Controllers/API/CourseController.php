@@ -21,8 +21,8 @@ class CourseController extends Controller implements HasMiddleware
 
     public function store(Request $request) {
         $validation = Validator::make($request->input(), [
-            'title' => 'required|string|min:2|max:16',
-            'summary' => 'required|string|min:2|max:64',
+            'title' => 'required|string|min:2|max:64',
+            'summary' => 'required|string|min:2|max:128',
             'description' => 'required|string|min:2|max:256',
         ]);
 
