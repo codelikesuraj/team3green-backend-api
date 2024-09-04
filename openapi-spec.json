@@ -723,7 +723,41 @@
         ],
         "summary": "Unpublish a course (admin only)",
         "description": "Unpublish a course and make it unavailable to the public (visible to only admin)",
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Course unpublished successfully",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "course": {
+                          "$ref": "#/components/schemas/CourseItem"
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "course unpublished successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/CourseNotFoundError"
+          }
+        }
       }
     },
     "/courses/{course}/enroll": {

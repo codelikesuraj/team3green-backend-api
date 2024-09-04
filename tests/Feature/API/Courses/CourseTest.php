@@ -287,3 +287,75 @@ test('only admins can publish a course by id or slug', function () {
                 ->etc()
         );
 });
+
+test('only admins can unpublish a course by id or slug', function () {
+    $password = 'passwO1$';
+
+    $user = User::factory()->create([
+        'password' => Hash::make($password)
+    ]);
+    $admin = User::factory()->create([
+        'role' => 'admin',
+        'password' => Hash::make($password)
+    ]);
+    $courses = Course::factory()->count(2)->create([
+        'is_published' => true
+    ]);
+
+    $this->postJson('/api/auth/login', [
+        'email' => $user->email,
+        'password' => $password
+    ])->assertOk();
+    foreach ($courses as $course) {
+        $this->postJson('/api/courses/' . $course->id . '/unpublish')
+            ->assertForbidden();
+        $this->postJson('/api/courses/' . $course->slug . '/unpublish')
+            ->assertForbidden();
+    }
+    
+    $this->postJson('/api/auth/login', [
+        'email' => $admin->email,
+        'password' => $password
+    ])->assertOk();
+
+    $this->postJson('/api/courses/' . $courses[0]->id . '/unpublish')
+        ->assertOk()
+        ->assertJson(
+            fn(AssertableJson $json)  =>
+            $json->hasAll(['message', 'data'])
+                ->where('data.course.id', $courses[0]->id)
+                ->where('data.course.title', $courses[0]->title)
+                ->where('data.course.summary', $courses[0]->summary)
+                ->where('data.course.description', $courses[0]->description)
+                ->where('data.course.is_published', false)
+                ->etc()
+        );
+    $this->postJson('/api/courses/' . $courses[1]->slug . '/unpublish')
+        ->assertOk()
+        ->assertJson(
+            fn(AssertableJson $json)  =>
+            $json->hasAll(['message', 'data'])
+                ->where('data.course.id', $courses[1]->id)
+                ->where('data.course.title', $courses[1]->title)
+                ->where('data.course.summary', $courses[1]->summary)
+                ->where('data.course.description', $courses[1]->description)
+                ->where('data.course.is_published', false)
+                ->etc()
+        );
+    $this->postJson('/api/courses/999999/publish')
+        ->assertNotFound()
+        ->assertJson(
+            fn(AssertableJson $json)  =>
+            $json->hasAll(['message', 'errors'])
+                ->where('message', 'course not found')
+                ->etc()
+        );
+    $this->postJson('/api/courses/random-slug/publish')
+        ->assertNotFound()
+        ->assertJson(
+            fn(AssertableJson $json)  =>
+            $json->hasAll(['message', 'errors'])
+                ->where('message', 'course not found')
+                ->etc()
+        );
+});

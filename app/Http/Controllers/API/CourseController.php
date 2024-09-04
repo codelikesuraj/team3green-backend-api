@@ -15,7 +15,7 @@ class CourseController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware(Admin::class, only: ['store', 'publish'])
+            new Middleware(Admin::class, only: ['store', 'publish', 'unpublish'])
         ];
     }
 
@@ -65,14 +65,9 @@ class CourseController extends Controller implements HasMiddleware
     }
 
     public function publish(Request $request, $courseId) {
-        $course = Course::where(function ($query) use ($courseId) {
-            $query->where('id', intval($courseId))
-                ->orWhere('slug', strval($courseId));
-        })
-        ->when(is_student(auth()->user()), function ($query) {
-            $query->where('is_published', true);
-        })
-        ->first();
+        $course = Course::where('id', intval($courseId))
+            ->orWhere('slug', strval($courseId))
+            ->first();
 
         if (!$course) {
             return error_response('course not found', ['course ' . $courseId . ' not found'], 404);
@@ -82,6 +77,23 @@ class CourseController extends Controller implements HasMiddleware
         $course->save();
 
         return success_response('course published successfully', [
+            'course' => $course
+        ], 200);
+    }
+
+    public function unpublish(Request $request, $courseId) {
+        $course = Course::where('id', intval($courseId))
+            ->orWhere('slug', strval($courseId))
+            ->first();
+
+        if (!$course) {
+            return error_response('course not found', ['course ' . $courseId . ' not found'], 404);
+        }
+
+        $course->is_published = false;
+        $course->save();
+
+        return success_response('course unpublished successfully', [
             'course' => $course
         ], 200);
     }
