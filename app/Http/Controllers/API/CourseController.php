@@ -15,7 +15,7 @@ class CourseController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware(Admin::class, except: ['index'])
+            new Middleware(Admin::class, only: ['store'])
         ];
     }
 
@@ -42,6 +42,25 @@ class CourseController extends Controller implements HasMiddleware
             'courses' => Course::when(is_student(auth()->user()), function ($query) {
                 $query->where('is_published', true);
             })->get()
+        ], 200);
+    }
+
+    public function show(Request $request, $courseId) {
+        $course = Course::where(function ($query) use ($courseId) {
+            $query->where('id', intval($courseId))
+                ->orWhere('slug', strval($courseId));
+        })
+        ->when(is_student(auth()->user()), function ($query) {
+            $query->where('is_published', true);
+        })
+        ->first();
+
+        if (!$course) {
+            return error_response('course not found', ['course ' . $courseId . ' not found'], 404);
+        }
+
+        return success_response('course found', [
+            'course' => $course
         ], 200);
     }
 }
