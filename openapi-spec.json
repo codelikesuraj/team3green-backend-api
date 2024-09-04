@@ -100,6 +100,35 @@
           }
         }
       },
+      "CourseItemPublished": {
+        "type": "object",
+        "properties": {
+          "id":{
+            "type": "string",
+            "example": "999"
+          },
+          "title":{
+            "type": "string",
+            "example": "course title"
+          },
+          "slug":{
+            "type": "string",
+            "example": "slug-based-on-course-title"
+          },
+          "summary":{
+            "type": "string",
+            "example": "a short description or summary of the course"
+          },
+          "description":{
+            "type": "string",
+            "example": "a long description of the course title which may span multiple lines and paragraphs"
+          },
+          "is_published":{
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
       "CourseNotFound": {
         "type": "object",
         "properties": {
@@ -546,7 +575,12 @@
                   "type": "object",
                   "properties": {
                     "data": {
-                      "$ref": "#/components/schemas/CourseItem"
+                      "type": "object",
+                      "properties": {
+                        "course": {
+                          "$ref": "#/components/schemas/CourseItem"
+                        }
+                      }
                     },
                     "message": {
                       "type": "string",
@@ -631,7 +665,41 @@
         ],
         "summary": "Publish a course (admin only)",
         "description": "Publish a course and make it available to the public",
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Course published successfully",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "course": {
+                          "$ref": "#/components/schemas/CourseItemPublished"
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "course published successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/CourseNotFoundError"
+          }
+        }
       }
     },
     "/courses/{course}/unpublish": {

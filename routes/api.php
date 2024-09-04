@@ -24,4 +24,5 @@ Route::group(['prefix' => 'courses', 'middleware' => 'auth:api'], function () {
     Route::post('/', [CourseController::class, 'store']);
     Route::get('/', [CourseController::class, 'index']);
     Route::get('/{course}', [CourseController::class, 'show']);
+    Route::post('/{course}/publish', [CourseController::class, 'publish']);
 });
