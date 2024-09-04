@@ -27,3 +27,15 @@ if (!function_exists('extract_errors')) {
         return $result;
     }
 }
+
+if (!function_exists('is_student')) {
+    function is_student($user) {
+        return $user->role === 'student';
+    }
+}
+
+if (!function_exists('is_admin')) {
+    function is_admin($user) {
+        return $user->role === 'admin';
+    }
+}

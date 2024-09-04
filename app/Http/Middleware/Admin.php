@@ -15,7 +15,7 @@ class Admin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth('api')->user()->role === 'student') {
+        if (!is_admin(auth('api')->user())) {
             return error_response('unauthorized', ['you do not have the permission to perform this action'], 403);
         }
         

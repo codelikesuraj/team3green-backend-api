@@ -15,9 +15,10 @@ class CourseController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware(Admin::class)
+            new Middleware(Admin::class, except: ['index'])
         ];
     }
+
     public function store(Request $request) {
         $validation = Validator::make($request->input(), [
             'title' => 'required|string|min:2|max:16',
@@ -34,5 +35,13 @@ class CourseController extends Controller implements HasMiddleware
         return success_response('course created successfully', [
             'course' => $course
         ], 201);
+    }
+
+    public function index(Request $request) {
+        return success_response('course created successfully', [
+            'courses' => Course::when(is_student(auth()->user()), function ($query) {
+                $query->where('is_published', true);
+            })->get()
+        ], 200);
     }
 }

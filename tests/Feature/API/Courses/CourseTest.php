@@ -57,3 +57,51 @@ test('only admin can create course', function () {
     
     $this->assertDatabaseCount('courses', 1);
 });
+
+test('student can only fetch all published courses', function () {
+    $password = 'passwO1$';
+    $student = User::factory()->create([
+        'password' => Hash::make($password)
+    ]);
+    $this->postJson('/api/auth/login', [
+        'email' => $student->email,
+        'password' => $password
+    ])
+        ->assertOk();
+
+    Course::factory()->count(5)->create();
+    Course::factory()->count(5)->create(['is_published' => true]);
+    $this->getJson('/api/courses')
+        ->assertOk()
+        ->assertJson(fn (AssertableJson $json) =>
+            $json->has('data.courses', 5)
+                ->has('data.courses.0', fn (AssertableJson $json) => 
+                    $json->where('is_published', true)
+                        ->etc()
+                )
+                ->etc()
+        );
+});
+
+test('admin can fetch both published & unpublished published courses', function () {
+    $password = 'passwO1$';
+    $admin = User::factory()->create([
+        'role' => 'admin',
+        'password' => Hash::make($password)
+    ]);
+    $this->postJson('/api/auth/login', [
+        'email' => $admin->email,
+        'password' => $password
+    ])
+        ->assertOk();
+
+    Course::factory()->count(5)->create();
+    Course::factory()->count(5)->create(['is_published' => true]);
+    $this->getJson('/api/courses')
+        ->assertOk()
+        ->dump()
+        ->assertJson(fn (AssertableJson $json) =>
+            $json->has('data.courses', 10)
+                ->etc()
+        );
+});
