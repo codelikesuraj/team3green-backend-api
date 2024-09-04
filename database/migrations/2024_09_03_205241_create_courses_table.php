@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('slug');
             $table->tinyText('summary');
             $table->longText('description');
+            $table->boolean('is_published')->default(false);
             $table->timestamps();
         });
     }

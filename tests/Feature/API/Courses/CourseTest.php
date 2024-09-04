@@ -47,10 +47,11 @@ test('only admin can create course', function () {
         ->assertCreated()
         ->assertJson(
             fn(AssertableJson $json)  =>
-            $json->hasAll(['message', 'data', 'data.course', 'data.course.slug'])
+            $json->hasAll(['message', 'data.course.slug'])
                 ->where('data.course.title', $course->title)
                 ->where('data.course.summary', $course->summary)
                 ->where('data.course.description', $course->description)
+                ->where('data.course.is_published', false)
                 ->etc()
         );
     
