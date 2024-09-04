@@ -3,7 +3,7 @@
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
 
-// uses(RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 test('user can register', function () {
     $user = [
@@ -19,6 +19,7 @@ test('user can register', function () {
             $json->hasAll(['data.accessToken', 'data.user.id'])
                 ->where('data.user.name', $user['name'])
                 ->where('data.user.email', $user['email'])
+                ->where('data.user.role', 'student')
                 ->etc()
         );
 });
@@ -57,6 +58,7 @@ test('user cannot register with duplicate email', function () {
             $json->hasAll(['data.accessToken', 'data.user.id'])
                 ->where('data.user.name', $user['name'])
                 ->where('data.user.email', $user['email'])
+                ->where('data.user.role', 'student')
                 ->etc()
         );
 
@@ -78,6 +80,7 @@ test('registered user can login', function () {
             $json->hasAll(['data.accessToken', 'data.user.id'])
                 ->where('data.user.name', $user['name'])
                 ->where('data.user.email', $user['email'])
+                ->where('data.user.role', 'student')
                 ->etc()
         );
 
@@ -88,6 +91,7 @@ test('registered user can login', function () {
             $json->hasAll(['data.accessToken', 'data.user.id'])
                 ->where('data.user.name', $user['name'])
                 ->where('data.user.email', $user['email'])
+                ->where('data.user.role', 'student')
                 ->etc()
         );
 });
@@ -120,6 +124,7 @@ test('authenticated user can log out', function () {
             $json->hasAll(['data.accessToken', 'data.user.id'])
                 ->where('data.user.name', $user['name'])
                 ->where('data.user.email', $user['email'])
+                ->where('data.user.role', 'student')
                 ->etc()
         );
 

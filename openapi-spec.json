@@ -237,6 +237,10 @@
           "email":{
             "type": "string",
             "example": "johndoe@example.com"
+          },
+          "role":{
+            "type": "string",
+            "example": "student"
           }
         }
       },
