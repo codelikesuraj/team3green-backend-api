@@ -93,6 +93,10 @@
           "description":{
             "type": "string",
             "example": "a long description of the course title which may span multiple lines and paragraphs"
+          },
+          "is_published":{
+            "type": "boolean",
+            "example": false
           }
         }
       },
