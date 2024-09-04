@@ -641,7 +641,32 @@
         ],
         "summary": "Delete a course (admin only)",
         "description": "Deletes a specific course",
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Course deleted successfully",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "course deleted successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/CourseNotFoundError"
+          }}
       }
     },
     "/courses/{course}/publish": {

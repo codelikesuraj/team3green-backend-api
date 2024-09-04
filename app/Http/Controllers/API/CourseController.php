@@ -15,7 +15,7 @@ class CourseController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware(Admin::class, only: ['store', 'publish', 'unpublish'])
+            new Middleware(Admin::class, only: ['store', 'publish', 'unpublish', 'delete'])
         ];
     }
 
@@ -96,5 +96,19 @@ class CourseController extends Controller implements HasMiddleware
         return success_response('course unpublished successfully', [
             'course' => $course
         ], 200);
+    }
+
+    public function delete(Request $request, $courseId) {
+        $course = Course::where('id', intval($courseId))
+            ->orWhere('slug', strval($courseId))
+            ->first();
+
+        if (!$course) {
+            return error_response('course not found', ['course ' . $courseId . ' not found'], 404);
+        }
+
+        $course->delete();
+
+        return success_response('course deleted successfully', [], 200);
     }
 }

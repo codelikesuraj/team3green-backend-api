@@ -342,7 +342,7 @@ test('only admins can unpublish a course by id or slug', function () {
                 ->where('data.course.is_published', false)
                 ->etc()
         );
-    $this->postJson('/api/courses/999999/publish')
+    $this->postJson('/api/courses/999999/unpublish')
         ->assertNotFound()
         ->assertJson(
             fn(AssertableJson $json)  =>
@@ -350,7 +350,68 @@ test('only admins can unpublish a course by id or slug', function () {
                 ->where('message', 'course not found')
                 ->etc()
         );
-    $this->postJson('/api/courses/random-slug/publish')
+    $this->postJson('/api/courses/random-slug/unpublish')
+        ->assertNotFound()
+        ->assertJson(
+            fn(AssertableJson $json)  =>
+            $json->hasAll(['message', 'errors'])
+                ->where('message', 'course not found')
+                ->etc()
+        );
+});
+
+test('only admins can delete a course by id or slug', function () {
+    $password = 'passwO1$';
+
+    $user = User::factory()->create([
+        'password' => Hash::make($password)
+    ]);
+    $admin = User::factory()->create([
+        'role' => 'admin',
+        'password' => Hash::make($password)
+    ]);
+    $courses = Course::factory()->count(2)->create([
+        'is_published' => true
+    ]);
+
+    $this->postJson('/api/auth/login', [
+        'email' => $user->email,
+        'password' => $password
+    ])->assertOk();
+    foreach ($courses as $course) {
+        $this->deleteJson('/api/courses/' . $course->id)
+            ->assertForbidden();
+        $this->deleteJson('/api/courses/' . $course->slug)
+            ->assertForbidden();
+    }
+    
+    $this->postJson('/api/auth/login', [
+        'email' => $admin->email,
+        'password' => $password
+    ])->assertOk();
+    $this->deleteJson('/api/courses/' . $courses[0]->id)
+        ->assertOk()
+        ->assertJson(
+            fn(AssertableJson $json)  =>
+            $json->has('message')
+                ->etc()
+        );
+    $this->deleteJson('/api/courses/' . $courses[1]->slug)
+        ->assertOk()
+        ->assertJson(
+            fn(AssertableJson $json)  =>
+            $json->has('message')
+                ->etc()
+        );
+    $this->deleteJson('/api/courses/999999')
+        ->assertNotFound()
+        ->assertJson(
+            fn(AssertableJson $json)  =>
+            $json->hasAll(['message', 'errors'])
+                ->where('message', 'course not found')
+                ->etc()
+        );
+    $this->deleteJson('/api/courses/random-slug')
         ->assertNotFound()
         ->assertJson(
             fn(AssertableJson $json)  =>
