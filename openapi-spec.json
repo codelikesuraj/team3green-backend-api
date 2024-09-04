@@ -259,10 +259,63 @@
             "$ref": "#/components/schemas/User"
           }
         }
+      },
+      "AdminWithToken": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string",
+            "example": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          },
+          "admin": {
+            "$ref": "#/components/schemas/User"
+          }
+        }
       }
     }
   },
   "paths": {
+    "/auth/create-admin": {
+      "post": {
+        "tags": ["Testing use only"],
+        "summary": "Temporary endpoint for create admin users",
+        "description": "Create a new admin",
+        "requestBody":{
+          "required": true,
+          "content":{
+            "application/json":{
+              "schema":{
+                "$ref": "#/components/schemas/UserRegisterParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Admin created successfully",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/AdminWithToken"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "admin created successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationError"
+          }
+        }
+      }
+    },
     "/auth/register": {
       "post": {
         "tags": ["Authentication"],

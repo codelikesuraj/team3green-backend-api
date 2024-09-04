@@ -99,7 +99,6 @@ test('admin can fetch both published & unpublished published courses', function 
     Course::factory()->count(5)->create(['is_published' => true]);
     $this->getJson('/api/courses')
         ->assertOk()
-        ->dump()
         ->assertJson(fn (AssertableJson $json) =>
             $json->has('data.courses', 10)
                 ->etc()
