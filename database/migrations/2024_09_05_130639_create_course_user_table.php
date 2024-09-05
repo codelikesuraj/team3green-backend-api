@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('course_id');
             $table->foreignId('user_id');
+            $table->boolean('is_completed')->default(false);
             $table->timestamps();
         });
     }
