@@ -249,14 +249,15 @@ test('only admins can publish a course by id or slug', function () {
     $this->postJson('/api/courses/' . $courses[0]->id . '/publish')
         ->assertOk()
         ->assertJson(
-            fn(AssertableJson $json)  =>
-            $json->hasAll(['message', 'data'])
-                ->where('data.course.id', $courses[0]->id)
-                ->where('data.course.title', $courses[0]->title)
-                ->where('data.course.summary', $courses[0]->summary)
-                ->where('data.course.description', $courses[0]->description)
-                ->where('data.course.is_published', true)
-                ->etc()
+            function (AssertableJson $json) use ($courses)  {
+                $json->hasAll(['message', 'data'])
+                    ->where('data.course.id', $courses[0]->id)
+                    ->where('data.course.title', $courses[0]->title)
+                    ->where('data.course.summary', $courses[0]->summary)
+                    ->where('data.course.description', $courses[0]->description)
+                    ->where('data.course.is_published', true)
+                    ->etc();
+            }
         );
     $this->postJson('/api/courses/' . $courses[1]->slug . '/publish')
         ->assertOk()
@@ -419,4 +420,58 @@ test('only admins can delete a course by id or slug', function () {
                 ->where('message', 'course not found')
                 ->etc()
         );
+});
+
+test('only admins can update a course by id or slug', function () {
+    $password = 'passwO1$';
+
+    $user = User::factory()->create([
+        'password' => Hash::make($password)
+    ]);
+    $admin = User::factory()->create([
+        'role' => 'admin',
+        'password' => Hash::make($password)
+    ]);
+
+    $courses = Course::factory()->count(2)->create();
+    $courseUpdate = [
+        'title' => fake()->word(),
+        'summary' => fake()->word(),
+        'description' => fake()->word()
+    ];
+
+    $this->postJson('/api/auth/login', [
+        'email' => $user->email,
+        'password' => $password
+    ])->assertOk();
+    foreach ($courses as $course) {
+        $this->putJson('/api/courses/' . $course->id, $courseUpdate)
+            ->assertForbidden();
+        $this->putJson('/api/courses/' . $course->slug, $courseUpdate)
+            ->assertForbidden();
+    }
+    
+    $this->postJson('/api/auth/login', [
+        'email' => $admin->email,
+        'password' => $password
+    ])->assertOk();
+    foreach ($courses as $course) {
+        $this->putJson('/api/courses/' . $course->id, $courseUpdate)
+            ->assertOk()
+            ->assertJson(
+                fn(AssertableJson $json)  =>
+                $json->hasAll(['message', 'data.course'])
+                    ->etc()
+            );
+        $this->getJson('/api/courses/' . $course->id)
+            ->assertOk()
+            ->assertJson(fn (AssertableJson $json) =>
+                $json->has('data.course')
+                    ->where('data.course.id', $course->id)
+                    ->where('data.course.title', $courseUpdate['title'])
+                    ->where('data.course.summary', $courseUpdate['summary'])
+                    ->where('data.course.description', $courseUpdate['description'])
+                    ->etc()
+            );
+    }
 });

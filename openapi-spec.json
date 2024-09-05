@@ -223,6 +223,41 @@
           }
         }
       },
+      "CreateCourseParam": {
+        "type": "object",
+        "required": ["title", "summary", "description"],
+        "properties": {
+          "title":{
+            "type": "string",
+            "example": "course title"
+          },
+          "summary":{
+            "type": "string",
+            "example": "course summary"
+          },
+          "description":{
+            "type": "string",
+            "example": "course description"
+          }
+        }
+      },
+      "UpdateCourseParam": {
+        "type": "object",
+        "properties": {
+          "title":{
+            "type": "string",
+            "example": "new course title"
+          },
+          "summary":{
+            "type": "string",
+            "example": "new course summary"
+          },
+          "description":{
+            "type": "string",
+            "example": "new course description"
+          }
+        }
+      },
       "UserRegisterParam": {
         "type": "object",
         "required": ["name", "email", "password"],
@@ -470,6 +505,16 @@
         ],
         "summary": "Create a course (admin only)",
         "description": "Creates a new course",
+        "requestBody":{
+          "required": true,
+          "content":{
+            "application/json":{
+              "schema":{
+                "$ref": "#/components/schemas/CreateCourseParam"
+              }
+            }
+          }
+        },
         "responses": {
           "201": {
             "description": "Courses created successfully",
@@ -619,7 +664,48 @@
         ],
         "summary": "Update a course (admin only)",
         "description": "Updates a specific course",
-        "responses": {}
+        "requestBody":{
+          "required": true,
+          "content":{
+            "application/json":{
+              "schema":{
+                "$ref": "#/components/schemas/UpdateCourseParam"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Course updated",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "course": {
+                          "$ref": "#/components/schemas/CourseItem"
+                        }
+                      }
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "course updated successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/CourseNotFoundError"
+          }
+        }
       },
       "delete": {
         "tags": ["Courses"],

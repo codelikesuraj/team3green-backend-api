@@ -15,7 +15,7 @@ class CourseController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware(Admin::class, only: ['store', 'publish', 'unpublish', 'delete'])
+            new Middleware(Admin::class, except: ['index', 'show'])
         ];
     }
 
@@ -94,6 +94,37 @@ class CourseController extends Controller implements HasMiddleware
         $course->save();
 
         return success_response('course unpublished successfully', [
+            'course' => $course
+        ], 200);
+    }
+
+    public function update(Request $request, $courseId) {
+        $validation = Validator::make($request->input(), [
+            'title' => 'sometimes|required|string|min:2|max:64',
+            'summary' => 'sometimes|required|string|min:2|max:128',
+            'description' => 'sometimes|required|string|min:2|max:256',
+        ]);
+
+        if ($validation->fails()) {
+            return error_response('validation error', extract_errors($validation->errors()->toArray()), 422);
+        }
+
+        $course = Course::where('id', intval($courseId))
+            ->orWhere('slug', strval($courseId))
+            ->first();
+
+        if (!$course) {
+            return error_response('course not found', ['course ' . $courseId . ' not found'], 404);
+        }
+
+        foreach ($request->only('title', 'summary', 'description') as $input => $value) {
+            if ($value) {
+                $course->$input = $value;
+            }
+        }
+        $course->save();
+
+        return success_response('course updated successfully', [
             'course' => $course
         ], 200);
     }
