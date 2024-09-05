@@ -892,7 +892,31 @@
         ],
         "summary": "Enroll in a course (student only)",
         "description": "Enroll in a course (students can only enrol in published courses)",
-        "responses": {}
+        "responses": {"200": {
+            "description": "Student enrolled successfully",
+            "content":{
+              "application/json":{
+                "schema":{
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "student enrolled successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/UnauthenticatedError"
+          },
+          "403": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "404": {
+            "$ref": "#/components/responses/CourseNotFoundError"
+          }}
       }
     },
     "/courses/{course}/unenroll": {

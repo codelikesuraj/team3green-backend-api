@@ -28,4 +28,5 @@ Route::group(['prefix' => 'courses', 'middleware' => 'auth:api'], function () {
     Route::delete('/{course}', [CourseController::class, 'delete']);
     Route::post('/{course}/publish', [CourseController::class, 'publish']);
     Route::post('/{course}/unpublish', [CourseController::class, 'unpublish']);
+    Route::post('/{course}/enroll', [CourseController::class, 'enroll']);
 });

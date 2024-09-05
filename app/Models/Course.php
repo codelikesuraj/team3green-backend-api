@@ -37,4 +37,9 @@ class Course extends Model
             ]
         ];
     }
+
+    public function enrolledStudents()
+    {
+        return $this->belongsToMany(User::class);
+    }
 }

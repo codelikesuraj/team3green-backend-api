@@ -475,3 +475,35 @@ test('only admins can update a course by id or slug', function () {
             );
     }
 });
+
+test('only students can enroll in a course', function () {
+    $password = 'passwO1$';
+
+    $student = User::factory()->create([
+        'password' => Hash::make($password)
+    ]);
+    $admin = User::factory()->create([
+        'role' => 'admin',
+        'password' => Hash::make($password)
+    ]);
+
+    $course = Course::factory()->create(['is_published' => true]);
+
+    $this->postJson('/api/auth/login', [
+        'email' => $admin->email,
+        'password' => $password
+    ])->assertOk();
+    $this->postJson('/api/courses/' . $course->id . '/enroll')
+        ->assertForbidden();
+
+    $this->postJson('/api/auth/login', [
+        'email' => $student->email,
+        'password' => $password
+    ])->assertOk();
+    $this->postJson('/api/courses/' . $course->id . '/enroll')
+        ->assertOk();
+    $this->assertDatabaseCount('course_user', 1);
+    $this->postJson('/api/courses/' . $course->id . '/enroll')
+        ->assertUnauthorized();
+    $this->assertDatabaseCount('course_user', 1);
+});

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Middleware\Admin;
+use App\Http\Middleware\Student;
 use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -15,7 +16,8 @@ class CourseController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware(Admin::class, except: ['index', 'show'])
+            new Middleware(Admin::class, except: ['index', 'show', 'enroll']),
+            new Middleware(Student::class, only: ['enroll']),
         ];
     }
 
@@ -141,5 +143,27 @@ class CourseController extends Controller implements HasMiddleware
         $course->delete();
 
         return success_response('course deleted successfully', [], 200);
+    }
+
+    public function enroll(Request $request, $courseId) {
+        $course = Course::where('is_published', true)
+            ->where(function ($query) use ($courseId) {
+                $query->where('id', intval($courseId))
+                    ->orWhere('slug', strval($courseId));
+        })->first();
+
+        if (!$course) {
+            return error_response('course not found', ['course ' . $courseId . ' not found'], 404);
+        }
+
+        $user = auth()->user();
+
+        if ($user->enrolledCourses()->where('course_id', $course->id)->exists()) {
+            return error_response('user already enrolled', [], 401 );
+        }
+
+        $user->enrolledCourses()->attach($course->id);
+
+        return success_response('student enrolled successfully', [], 200);
     }
 }
