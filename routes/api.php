@@ -29,4 +29,5 @@ Route::group(['prefix' => 'courses', 'middleware' => 'auth:api'], function () {
     Route::post('/{course}/publish', [CourseController::class, 'publish']);
     Route::post('/{course}/unpublish', [CourseController::class, 'unpublish']);
     Route::post('/{course}/enroll', [CourseController::class, 'enroll']);
+    Route::post('/{course}/unenroll', [CourseController::class, 'unenroll']);
 });

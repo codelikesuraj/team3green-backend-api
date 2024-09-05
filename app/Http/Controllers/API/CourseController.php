@@ -16,8 +16,8 @@ class CourseController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware(Admin::class, except: ['index', 'show', 'enroll']),
-            new Middleware(Student::class, only: ['enroll']),
+            new Middleware(Admin::class, except: ['index', 'show', 'enroll', 'unenroll']),
+            new Middleware(Student::class, only: ['enroll', 'unenroll']),
         ];
     }
 
@@ -165,5 +165,27 @@ class CourseController extends Controller implements HasMiddleware
         $user->enrolledCourses()->attach($course->id);
 
         return success_response('student enrolled successfully', [], 200);
+    }
+
+    public function unenroll(Request $request, $courseId) {
+        $course = Course::where('is_published', true)
+            ->where(function ($query) use ($courseId) {
+                $query->where('id', intval($courseId))
+                    ->orWhere('slug', strval($courseId));
+        })->first();
+
+        if (!$course) {
+            return error_response('course not found', ['course ' . $courseId . ' not found'], 404);
+        }
+
+        $user = auth()->user();
+
+        if (!$user->enrolledCourses()->where('course_id', $course->id)->exists()) {
+            return error_response('user not enrolled in this course', [], 401 );
+        }
+
+        $user->enrolledCourses()->detach($course->id);
+
+        return success_response('student unenrolled successfully', [], 200);
     }
 }
