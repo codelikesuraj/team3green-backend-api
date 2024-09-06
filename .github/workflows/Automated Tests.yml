@@ -1,0 +1,22 @@
+name: Automated API tests For Education and E-learning
+
+on: 
+   workflow_dispatch:
+   push:
+
+jobs:
+  automated-api-tests:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Postman CLI
+        run: |
+          curl -o- "https://dl-cli.pstmn.io/install/osx_64.sh" | sh
+      - name: Login to Postman CLI
+        run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
+      - name: Run API tests
+        run: |
+          postman collection run "33081408-9df33d8f-8b61-444d-a251-40c7dd0537bd" -e "33081408-3e2a1df8-1070-4764-8fa5-a9bda92d3a0e"
+          postman collection run "33081408-b0ba9ee4-0bca-4bc9-9718-bea2f0f5bbc2" -e "33081408-3e2a1df8-1070-4764-8fa5-a9bda92d3a0e"
+      - name: logout
+        run: postman logout --with-api-key ${{ secrets.POSTMAN_API_KEY }}
