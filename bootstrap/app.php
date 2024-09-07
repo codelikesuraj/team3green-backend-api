@@ -6,6 +6,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -27,13 +28,14 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        // $exceptions->render(function (Exception $exception, Request $request) {
-        //     if ($request->expectsJson()) {
-        //         return error_response('internal server error', [
-        //             'if you\'re seeing this, FIRE the dev (-_-)'
-        //         ], 500);
-        //     }
-        // });
+        $exceptions->respond(function (Response $response) {
+            if ($response->getStatusCode() === 500) {
+                return back()->with([
+                    'message' => 'Internal server error',
+                    'errors' => ['if you\'re seeing this, fire the backend dev (-_-;)']
+                ]);
+            }
+        });
 
         $exceptions->render(function (AuthenticationException $e, Request $request) {
             if ($request->is("api/*")) {
