@@ -1,6 +1,9 @@
 # Team3Green Education and E-learning API
 Backend API for Team3Green's Education and E-learning hackathon project
 
+## Live URL
+[https://team3green.fly.dev](https://team3green.fly.dev)
+
 ## Setup instructions
 - Clone this project repository locally on your machine.
 - Go to the root of the newly cloned repository's folder.
